@@ -1,11 +1,11 @@
-#Installantions 
+# Installantions 
 
-##DOCKER
-###To build the docker
+## DOCKER
+### To build the docker
 ```
 docker build -t <<your docker name>> .
 ```
-###To run the docker
+### To run the docker
 ```
 docker run -ti --rm 
     -v ~/Docker_Share:/data \
@@ -15,7 +15,7 @@ docker run -ti --rm
     -e GITHUB_USER="$GITHUB_USER" \
     <<your docker name>>
 ```
-##To run the model
+## To run the model
 
 ```
 python3 -m venv venv
@@ -23,7 +23,6 @@ source venv/bin/activate
 pip install ai-edge-model-explorer
 ```
 
-#How to run the model
 ```
 model-explorer --host=0.0.0.0 --extensions CFGgrid-ME 
 ```
