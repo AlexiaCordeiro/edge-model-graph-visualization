@@ -1,4 +1,4 @@
-# Installantions 
+# Installations 
 
 ## DOCKER
 ### To build the docker
