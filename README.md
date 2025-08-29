@@ -26,3 +26,9 @@ pip install ai-edge-model-explorer
 ```
 model-explorer --host=0.0.0.0 --extensions CFGgrid-ME 
 ```
+
+# TO-DO
+
+[] ADD EDGES
+[] ADD METADATA
+[] ADD EDGES INFO
