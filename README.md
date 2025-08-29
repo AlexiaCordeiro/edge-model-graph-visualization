@@ -8,11 +8,11 @@ docker build -t <<your docker name>> .
 ###To run the docker
 ```
 docker run -ti --rm 
-    -v ~/Docker_Share:/data
-    -v ~/docker_configs/nvim:/root/.config/nvim
-    -p 8080:8080
-    -e GITHUB_TOKEN="$GITHUB_TOKEN"
-    -e GITHUB_USER="$GITHUB_USER"
+    -v ~/Docker_Share:/data \
+    -v ~/docker_configs/nvim:/root/.config/nvim \
+    -p 8080:8080 \
+    -e GITHUB_TOKEN="$GITHUB_TOKEN" \
+    -e GITHUB_USER="$GITHUB_USER" \
     <<your docker name>>
 ```
 ##To run the model
