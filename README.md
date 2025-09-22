@@ -3,7 +3,7 @@
 ## DOCKER
 ### To build the docker
 ```
-docker build -t <<your docker name>> .
+docker build -t model-explorer --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_ed25519)" .
 ```
 ### To run the docker
 ```
