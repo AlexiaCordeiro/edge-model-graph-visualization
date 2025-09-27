@@ -24,7 +24,7 @@ pip install ai-edge-model-explorer
 ```
 
 ```
-model-explorer --host=0.0.0.0 --extensions CFGgrid-ME 
+model-explorer --host=0.0.0.0 --extensions CFGgrid_ME 
 ```
 
 # TO-DO
