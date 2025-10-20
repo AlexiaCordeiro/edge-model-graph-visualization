@@ -2,6 +2,7 @@ from model_explorer import Adapter, AdapterMetadata, ModelExplorerGraphs, graph_
 from typing import Dict, List
 import re
 from pathlib import Path
+import os
 
 
 class CFGgridME(Adapter):
@@ -28,58 +29,50 @@ class CFGgridME(Adapter):
         graph = graph_builder.Graph(id=file_name)
         graphs = [graph]
         nodes = []
-        edges_connection = {}
-        edges = []
-        layers = "default"
-        for line in cfggrind_model:
-            if "cfg" in line:
-                layers = re.findall(r"cfg\s+(\S+)", line)
-            else:
-                edges = self.get_edges(line)
-            op_match = re.match(r"^(?:\S+\s+){2}(\S+)", line)
 
-            if not op_match:
-                continue
-            op_name = op_match.group(1)
-
-            if op_name == '"signal::main(11)"':
-                continue
-
-            if "cfg" not in line:
-                edges_connection[op_name] = edges
-            else:
-                edges_connection[op_name] = "None"
-
-            self.create_node(op_name, layers[0], nodes)
-
+        block = self.create_block(cfggrind_model)
+        self.create_node(nodes, block)
         graph.nodes.extend(nodes)
         for node in graph.nodes:
-            self.create_edges(node, edges_connection, graph)
+            self.create_edges(node, block, graph)
         return {"graphs": graphs}
 
-    def create_node(self, op_name, layers, nodes):
-        node = graph_builder.GraphNode(
-            id=op_name,
-            label=op_name.strip('"'),
-            namespace=str(layers),
-        )
-        nodes.append(node)
+    def create_node(self, nodes, block):
+        for key in block:
+            for value in block[key]:
+                node = graph_builder.GraphNode(
+                    id=value[0],
+                    label=value[0],
+                    namespace=key,
+                )
+                nodes.append(node)
 
         return nodes
 
-    def create_edges(self, node, edges_connection, graph):
-        node_edges = edges_connection.get(node.id, [])
-        for edge in node_edges:
+    def create_edges(self, node, block, graph):
+        node_edges_map = {}
+        for cfg_id, nodes_list in block.items():
+            for node_addr, edges in nodes_list:
+                node_edges_map[node_addr] = edges
 
-            target_node = next((n for n in graph.nodes if n.id == edge), None)
-            if target_node:
-                target_node.incomingEdges.append(
-                    graph_builder.IncomingEdge(
+        if node.id in node_edges_map:
+            target_nodes = node_edges_map[node.id]
+
+            for target_node_id in target_nodes:
+                if target_node_id == "exit":
+                    continue
+
+                target_node = next(
+                    (n for n in graph.nodes if n.id == target_node_id), None
+                )
+                if target_node:
+                    edge = graph_builder.IncomingEdge(
                         sourceNodeId=node.id,
                         sourceNodeOutputId=node.id,
                         targetNodeInputId=target_node.id,
                     )
-                )
+                    target_node.incomingEdges.append(edge)
+
         return node
 
     def get_edges(self, line):
@@ -90,6 +83,33 @@ class CFGgridME(Adapter):
         for edge in values:
             edge = edge.replace("[", "").replace("]", "").split(":")
             edges.append(edge[0])
-        
+
         return edges
 
+    def create_block(self, cfggrind_model):
+        block = {}
+        current_layer = ""
+        layer = ""
+        for line in cfggrind_model:
+            if (
+                "cfg" in line
+                and "unknown" not in line
+                and "#" not in line
+                and "test::(" not in line
+                and os.path.expanduser("~") in line
+            ):
+                match = re.search(r"cfg\s+(\S+)", line)
+                if match:
+                    current_layer = match.group(1)
+                    block[current_layer] = []
+                    layer = current_layer.split(":")
+
+            elif layer and line.startswith("[node"):
+                if line.startswith(f"[node {layer[0]}"):
+                    edges = self.get_edges(line)
+                    op_match = re.match(r"^(?:\S+\s+){2}(\S+)", line)
+                    if not op_match:
+                        continue
+                    op_name = op_match.group(1)
+                    block[current_layer].append((op_name, edges))
+        return block
