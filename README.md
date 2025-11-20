@@ -16,5 +16,7 @@ model-explorer --host=0.0.0.0 --extensions CFGgrid_ME
 # TO-DO
 
 - [ x ] ADD EDGES
+- [ ] GET DOT
+- [ ] TREAT METADATA 
 - [ ] ADD METADATA
 - [ ] ADD EDGES INFO
