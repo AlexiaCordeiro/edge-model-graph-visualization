@@ -76,7 +76,7 @@ def get_metadata(dot_path: str) -> list:
         with open(dot_path, "r", encoding="utf8") as j:
             dot_data = [line.strip() for line in j if line.strip()]
     except OSError as e:
-        print(f"Error getting json file: {e}")
+        print(f"Error getting dot file: {e}")
 
     return dot_data
 
