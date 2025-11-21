@@ -1,0 +1,206 @@
+{
+  "functions": 264,
+  "complete": 34,
+  "incomplete": 230,
+  "blocks": 2887,
+  "phantoms": 998,
+  "edges": 4968,
+  "static": {
+    "instructions": {
+      "count": 13489,
+      "opcodes": {
+        "endbr64": 5,
+        "sub": 5,
+        "add": 8,
+        "ret": 7,
+        "unknown": 13314,
+        "push": 16,
+        "mov": 51,
+        "cltq": 5,
+        "shl": 3,
+        "call": 8,
+        "movl": 3,
+        "jmp": 20,
+        "cmp": 6,
+        "jl": 4,
+        "lea": 8,
+        "movslq": 1,
+        "addl": 4,
+        "leave": 1,
+        "cmpb": 1,
+        "jne": 1,
+        "movb": 1,
+        "pop": 3,
+        "test": 1,
+        "je": 3,
+        "shr": 1,
+        "sar": 2,
+        "xor": 3,
+        "and": 1,
+        "nop": 2,
+        "jge": 1
+      }
+    },
+    "calls": 430,
+    "signals": 0
+  },
+  "dynamic": {
+    "instructions": {
+      "count": 140788,
+      "opcodes": {
+        "endbr64": 5,
+        "sub": 5,
+        "add": 51,
+        "ret": 7,
+        "unknown": 140109,
+        "push": 16,
+        "mov": 248,
+        "cltq": 43,
+        "shl": 13,
+        "call": 18,
+        "movl": 3,
+        "jmp": 35,
+        "cmp": 58,
+        "jl": 42,
+        "lea": 61,
+        "movslq": 6,
+        "addl": 33,
+        "leave": 1,
+        "cmpb": 1,
+        "jne": 1,
+        "movb": 1,
+        "pop": 3,
+        "test": 1,
+        "je": 3,
+        "shr": 1,
+        "sar": 2,
+        "xor": 3,
+        "and": 1,
+        "nop": 2,
+        "jge": 15
+      }
+    },
+    "calls": 1157,
+    "signals": 0
+  }
+}
+[
+  {
+    "cfg": "0x40123e",
+    "invoked": 1,
+    "complete": true,
+    "blocks": 13,
+    "phantoms": 0,
+    "exit": true,
+    "halt": false,
+    "edges": 16,
+    "static": {
+      "instructions": {
+        "count": 67,
+        "opcodes": {
+          "push": 2,
+          "mov": 30,
+          "sub": 2,
+          "cltq": 3,
+          "shl": 3,
+          "call": 6,
+          "movl": 2,
+          "jmp": 2,
+          "cmp": 2,
+          "jl": 2,
+          "lea": 6,
+          "add": 2,
+          "movslq": 1,
+          "addl": 2,
+          "leave": 1,
+          "ret": 1
+        }
+      },
+      "calls": 6,
+      "signals": 0
+    },
+    "dynamic": {
+      "instructions": {
+        "count": 248,
+        "opcodes": {
+          "push": 2,
+          "mov": 107,
+          "sub": 2,
+          "cltq": 13,
+          "shl": 13,
+          "call": 16,
+          "movl": 2,
+          "jmp": 2,
+          "cmp": 14,
+          "jl": 14,
+          "lea": 31,
+          "add": 12,
+          "movslq": 6,
+          "addl": 12,
+          "leave": 1,
+          "ret": 1
+        }
+      },
+      "calls": 16,
+      "signals": 0
+    },
+    "name": "/home/alexia/valgrind-3.25.1/cfggrind/tests/test::main(18)"
+  },
+  {
+    "cfg": "0x401166",
+    "invoked": 1,
+    "complete": false,
+    "blocks": 8,
+    "phantoms": 1,
+    "exit": true,
+    "halt": false,
+    "edges": 12,
+    "static": {
+      "instructions": {
+        "count": 36,
+        "opcodes": {
+          "push": 1,
+          "mov": 13,
+          "movl": 1,
+          "jmp": 2,
+          "cmp": 3,
+          "jl": 2,
+          "add": 3,
+          "nop": 2,
+          "pop": 1,
+          "ret": 1,
+          "cltq": 2,
+          "lea": 2,
+          "jge": 1,
+          "addl": 2
+        }
+      },
+      "calls": 0,
+      "signals": 0
+    },
+    "dynamic": {
+      "instructions": {
+        "count": 349,
+        "opcodes": {
+          "push": 1,
+          "mov": 133,
+          "movl": 1,
+          "jmp": 7,
+          "cmp": 43,
+          "jl": 28,
+          "add": 36,
+          "nop": 2,
+          "pop": 1,
+          "ret": 1,
+          "cltq": 30,
+          "lea": 30,
+          "jge": 15,
+          "addl": 21
+        }
+      },
+      "calls": 0,
+      "signals": 0
+    },
+    "name": "/home/alexia/valgrind-3.25.1/cfggrind/tests/test::bubble(4)"
+  }
+]
