@@ -55,7 +55,6 @@ def get_correct_block(model: list, function_name: str):
     block = []
     init_block = -1
     finish_block = -1
-
     for i, line in enumerate(model):
         if line.startswith("[cfg") and function_name in line:
             init_block = i
@@ -68,7 +67,6 @@ def get_correct_block(model: list, function_name: str):
         finish_block = i
 
     block = model[init_block : finish_block + 1]
-
     return block
 
 
@@ -85,11 +83,12 @@ def get_metadata(dot_path: str) -> list:
     Will get the metadata via the dot file informed
     """
     dot_data = []
-    try:
-        with open(dot_path, "r", encoding="utf8") as j:
-            dot_data = [line.strip() for line in j if line.strip()]
-    except OSError as e:
-        print(f"Error getting dot file: {e}")
+    if dot_path:
+        try:
+            with open(dot_path, "r", encoding="utf8") as j:
+                dot_data = [line.strip() for line in j if line.strip()]
+        except OSError as e:
+            print(f"Error getting dot file: {e}")
 
     return dot_data
 
@@ -105,8 +104,8 @@ def main():
     generate_files(block, treated_metadata, function_name)
 
     file_path = f"{function_name}_addapted.cfg"
-    if dot_path:
-        file_path = f"{function_name}_metadados.cfg"
+    #if dot_path:
+        #file_path = f"{function_name}_metadados.cfg"
 
     _run_model(file_path)
 

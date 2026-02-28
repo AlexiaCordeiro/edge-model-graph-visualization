@@ -95,8 +95,6 @@ class CFGgridME(Adapter):
                 "cfg" in line
                 and "unknown" not in line
                 and "#" not in line
-                and "test::(" not in line
-                and os.path.expanduser("~") in line
             ):
                 match = re.search(r"cfg\s+(\S+)", line)
                 if match:
