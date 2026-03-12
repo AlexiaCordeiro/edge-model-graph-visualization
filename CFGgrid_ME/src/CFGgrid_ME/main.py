@@ -30,7 +30,7 @@ class CFGgridME(Adapter):
         graphs = [graph]
         nodes = []
 
-        block = self.create_block(cfggrind_model)
+        block, metadata_dict = self.create_block(cfggrind_model)
         self.create_node(nodes, block)
         graph.nodes.extend(nodes)
         for node in graph.nodes:
@@ -110,4 +110,17 @@ class CFGgridME(Adapter):
                         continue
                     op_name = op_match.group(1)
                     block[current_layer].append((op_name, edges))
-        return block
+            else:
+                self.add_metadata(line, op_name)
+        return block, op_meta_dict
+
+    def add_metadata(self, metadata, operation):
+        separated_metadata = {} 
+        op_meta_dict = {}
+        metadata_list = metadata.split("',")
+        for data in metadata_list:
+            data.replace("\\", "").replace("[", "")
+            metas = data.split(":")
+            separated_metadata[metas[0]] = metas[1]
+            op_meta_dict[operation] = separated_metadata
+    return op_meta_dict

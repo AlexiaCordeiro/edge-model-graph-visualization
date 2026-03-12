@@ -1,7 +1,7 @@
 """
 subprocess: used to run terminal commands via python
 """
-
+import os
 import subprocess
 import argparse
 from utils.generate_cfg_file import (
@@ -102,11 +102,14 @@ def main():
     block = get_correct_block(model, function_name)
     treated_metadata = treat_metadata(dot_data)
     generate_files(block, treated_metadata, function_name)
-
-    file_path = f"{function_name}_addapted.cfg"
-    #if dot_path:
-        #file_path = f"{function_name}_metadados.cfg"
-
+    folder_name = "generated_files"
+    file_path = f"{folder_name}/{function_name}_addapted.cfg"
+    
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+    
+    if dot_path:
+        file_path = f"{folder_name}/{function_name}_metadados.cfg"
     _run_model(file_path)
 
 
