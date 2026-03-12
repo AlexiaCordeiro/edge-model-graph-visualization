@@ -30,12 +30,34 @@ class CFGgridME(Adapter):
         graphs = [graph]
         nodes = []
 
-        block = self.create_block(cfggrind_model)
+        block, metadata_dict = self.create_block(cfggrind_model)
         self.create_node(nodes, block)
         graph.nodes.extend(nodes)
         for node in graph.nodes:
-            self.create_edges(node, block, graph)
+            self.create_edges(node, block, graph)  
+            self.create_metadata(node, graph, metadata_dict)
         return {"graphs": graphs}
+   
+    def create_metadata(self, node, graph, metadata_dict):
+        for item in metadata_dict:
+            for operation, meta_list in item.items():
+                for i, value in enumerate(meta_list):
+                    if operation == node.id:
+                        key = self.clean_data(value)
+                        value = self.clean_data(meta_list.get(value))
+                        node.outputsMetadata.append(
+                            graph_builder.MetadataItem(
+                                id=i,
+                                attrs=[
+                                    graph_builder.KeyValue(
+                                        key=key, 
+                                        value=value,
+                                    )]
+                                    )
+                            )
+    def clean_data(self, line: str):
+       clean_line =  line.replace("\\", '').replace("'", '').replace("[", '').replace("]", '')
+       return clean_line
 
     def create_node(self, nodes, block):
         for key in block:
@@ -88,13 +110,16 @@ class CFGgridME(Adapter):
 
     def create_block(self, cfggrind_model):
         block = {}
+        op_meta = []
         current_layer = ""
         layer = ""
+        op_name = ""
         for line in cfggrind_model:
             if (
                 "cfg" in line
                 and "unknown" not in line
                 and "#" not in line
+                and "below" not in line
             ):
                 match = re.search(r"cfg\s+(\S+)", line)
                 if match:
@@ -106,8 +131,21 @@ class CFGgridME(Adapter):
                 if line.startswith(f"[node {layer[0]}"):
                     edges = self.get_edges(line)
                     op_match = re.match(r"^(?:\S+\s+){2}(\S+)", line)
-                    if not op_match:
-                        continue
                     op_name = op_match.group(1)
                     block[current_layer].append((op_name, edges))
-        return block
+            else:
+                if op_name:
+                    op_meta.append(self.add_metadata(line, op_name))
+        return block, op_meta
+
+    def add_metadata(self, metadata, operation):
+        separated_metadata = {} 
+        op_meta_dict = {}
+        metadata_list = metadata.split("',")
+        for data in metadata_list:
+            data.replace("\\", "").replace("[", "")
+            if ":" in data:
+                key, value = data.split(":")
+                separated_metadata[key] = value
+                op_meta_dict[operation] = separated_metadata
+        return op_meta_dict

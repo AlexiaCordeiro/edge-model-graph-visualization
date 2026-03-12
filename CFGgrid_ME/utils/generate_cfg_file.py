@@ -2,10 +2,10 @@ def generate_files(block: list, metadata: dict, function_name: str):
     """
     Generates both files with and without metadata
     """
-    file_name = f"{function_name}_addapted.cfg"
+    file_name = f"generated_files/{function_name}_addapted.cfg"
     _create_files(block, file_name)
     if metadata:
-        file_name = f"{function_name}_metadados.cfg"
+        file_name = f"generated_files/{function_name}_metadados.cfg"
         new_block = add_metadata_in_cfg(block, metadata)
         _create_files(new_block, file_name)
 
