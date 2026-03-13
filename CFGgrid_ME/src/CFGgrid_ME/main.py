@@ -34,8 +34,30 @@ class CFGgridME(Adapter):
         self.create_node(nodes, block)
         graph.nodes.extend(nodes)
         for node in graph.nodes:
-            self.create_edges(node, block, graph)
+            self.create_edges(node, block, graph)  
+            self.create_metadata(node, graph, metadata_dict)
         return {"graphs": graphs}
+   
+    def create_metadata(self, node, graph, metadata_dict):
+        for item in metadata_dict:
+            for operation, meta_list in item.items():
+                for i, value in enumerate(meta_list):
+                    if operation == node.id:
+                        key = self.clean_data(value)
+                        value = self.clean_data(meta_list.get(value))
+                        node.outputsMetadata.append(
+                            graph_builder.MetadataItem(
+                                id=i,
+                                attrs=[
+                                    graph_builder.KeyValue(
+                                        key=key, 
+                                        value=value,
+                                    )]
+                                    )
+                            )
+    def clean_data(self, line: str):
+       clean_line =  line.replace("\\", '').replace("'", '').replace("[", '').replace("]", '')
+       return clean_line
 
     def create_node(self, nodes, block):
         for key in block:
@@ -88,6 +110,7 @@ class CFGgridME(Adapter):
 
     def create_block(self, cfggrind_model):
         block = {}
+        op_meta = []
         current_layer = ""
         layer = ""
         for line in cfggrind_model:
@@ -111,8 +134,8 @@ class CFGgridME(Adapter):
                     op_name = op_match.group(1)
                     block[current_layer].append((op_name, edges))
             else:
-                self.add_metadata(line, op_name)
-        return block, op_meta_dict
+                op_meta.append(self.add_metadata(line, op_name))
+        return block, op_meta
 
     def add_metadata(self, metadata, operation):
         separated_metadata = {} 
@@ -120,7 +143,7 @@ class CFGgridME(Adapter):
         metadata_list = metadata.split("',")
         for data in metadata_list:
             data.replace("\\", "").replace("[", "")
-            metas = data.split(":")
-            separated_metadata[metas[0]] = metas[1]
+            key, value = data.split(":")
+            separated_metadata[key] = value
             op_meta_dict[operation] = separated_metadata
-    return op_meta_dict
+        return op_meta_dict
