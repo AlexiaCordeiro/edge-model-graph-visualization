@@ -20,7 +20,7 @@ def arguments():
     )
     parser.add_argument("-m", "--model_file", required=True)
     parser.add_argument("-d", "--dot_file", required=False)
-    parser.add_argument("-f", "--function_name", required=True)
+    parser.add_argument("-f", "--function_name", required=False)
     args = parser.parse_args()
 
     model_file = args.model_file
@@ -48,15 +48,18 @@ def get_model(model_path: str) -> list:
 def get_correct_block(model: list, function_name: str):
     """
     Based on the list with the lines of the CFG in model,
-    this funcction gets the specific block informed by the user
+    this function gets the specific block informed by the user
     via function_name
     """
 
     block = []
     init_block = -1
     finish_block = -1
+    correct_start = "::" + function_name
     for i, line in enumerate(model):
-        if line.startswith("[cfg") and function_name in line:
+        if (line.startswith("[cfg") 
+        and function_name in line 
+        and correct_start in line):
             init_block = i
             break
 
@@ -97,6 +100,10 @@ def main():
     """Get values"""
 
     model_path, dot_path, function_name = arguments()
+
+    if not function_name:
+        function_name = "main"
+
     model = get_model(model_path)
     dot_data = get_metadata(dot_path)
     block = get_correct_block(model, function_name)
@@ -110,6 +117,8 @@ def main():
     
     if dot_path:
         file_path = f"{folder_name}/{function_name}_metadados.cfg"
+    else:
+        file_path = f"{folder_name}/{function_name}_addapted.cfg"
     _run_model(file_path)
 
 

@@ -113,11 +113,13 @@ class CFGgridME(Adapter):
         op_meta = []
         current_layer = ""
         layer = ""
+        op_name = ""
         for line in cfggrind_model:
             if (
                 "cfg" in line
                 and "unknown" not in line
                 and "#" not in line
+                and "below" not in line
             ):
                 match = re.search(r"cfg\s+(\S+)", line)
                 if match:
@@ -129,12 +131,11 @@ class CFGgridME(Adapter):
                 if line.startswith(f"[node {layer[0]}"):
                     edges = self.get_edges(line)
                     op_match = re.match(r"^(?:\S+\s+){2}(\S+)", line)
-                    if not op_match:
-                        continue
                     op_name = op_match.group(1)
                     block[current_layer].append((op_name, edges))
             else:
-                op_meta.append(self.add_metadata(line, op_name))
+                if op_name:
+                    op_meta.append(self.add_metadata(line, op_name))
         return block, op_meta
 
     def add_metadata(self, metadata, operation):
@@ -143,7 +144,8 @@ class CFGgridME(Adapter):
         metadata_list = metadata.split("',")
         for data in metadata_list:
             data.replace("\\", "").replace("[", "")
-            key, value = data.split(":")
-            separated_metadata[key] = value
-            op_meta_dict[operation] = separated_metadata
+            if ":" in data:
+                key, value = data.split(":")
+                separated_metadata[key] = value
+                op_meta_dict[operation] = separated_metadata
         return op_meta_dict
