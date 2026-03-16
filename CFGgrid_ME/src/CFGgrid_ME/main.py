@@ -30,21 +30,23 @@ class CFGgridME(Adapter):
         graphs = [graph]
         nodes = []
 
-        block, metadata_dict = self.create_block(cfggrind_model)
+        block, metadata_dict, iterations = self.create_block(cfggrind_model)
         self.create_node(nodes, block)
         graph.nodes.extend(nodes)
         for node in graph.nodes:
-            self.create_edges(node, block, graph)  
-            self.create_metadata(node, graph, metadata_dict)
+            self.create_edges(node, block,graph)  
+            self.create_metadata(node, graph, metadata_dict, iterations)
         return {"graphs": graphs}
    
-    def create_metadata(self, node, graph, metadata_dict):
+    def create_metadata(self, node, graph, metadata_dict, iterations):
         for item in metadata_dict:
             for operation, meta_list in item.items():
                 for i, value in enumerate(meta_list):
                     if operation == node.id:
                         key = self.clean_data(value)
                         value = self.clean_data(meta_list.get(value))
+                        if str(node.id) not in iterations:
+                            iterations[str(node.id)] = '1'
                         node.outputsMetadata.append(
                             graph_builder.MetadataItem(
                                 id=i,
@@ -53,8 +55,11 @@ class CFGgridME(Adapter):
                                         key=key, 
                                         value=value,
                                     )]
-                                    )
+                                )
                             )
+
+    def 
+
     def clean_data(self, line: str):
        clean_line =  line.replace("\\", '').replace("'", '').replace("[", '').replace("]", '')
        return clean_line
@@ -101,12 +106,18 @@ class CFGgridME(Adapter):
         op_match = re.findall(r"(?<=\[)(.*?)(?=\])", line)
         edges = []
         values = op_match[-1].split(" ")
+        iteration = {}
 
         for edge in values:
             edge = edge.replace("[", "").replace("]", "").split(":")
             edges.append(edge[0])
+            if len(edge) > 1 and 'x' in edge[0]:
+                iteration[edge[0]] = edge[1]
+                print("iteration", iteration)
+            else:
+                iteration[edge[0]] = "1"
 
-        return edges
+        return edges, iteration
 
     def create_block(self, cfggrind_model):
         block = {}
@@ -120,6 +131,7 @@ class CFGgridME(Adapter):
                 and "unknown" not in line
                 and "#" not in line
                 and "below" not in line
+
             ):
                 match = re.search(r"cfg\s+(\S+)", line)
                 if match:
@@ -129,14 +141,14 @@ class CFGgridME(Adapter):
 
             elif layer and line.startswith("[node"):
                 if line.startswith(f"[node {layer[0]}"):
-                    edges = self.get_edges(line)
+                    edges, iterations = self.get_edges(line)
                     op_match = re.match(r"^(?:\S+\s+){2}(\S+)", line)
                     op_name = op_match.group(1)
                     block[current_layer].append((op_name, edges))
             else:
                 if op_name:
                     op_meta.append(self.add_metadata(line, op_name))
-        return block, op_meta
+        return block, op_meta, iterations
 
     def add_metadata(self, metadata, operation):
         separated_metadata = {} 
