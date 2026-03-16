@@ -34,8 +34,10 @@ class CFGgridME(Adapter):
         self.create_node(nodes, block)
         graph.nodes.extend(nodes)
         for node in graph.nodes:
-            self.create_edges(node, block,graph)  
+            self.create_edges(node, block,graph)
+            self.add_attributes(node, graph, metadata_dict)
             self.create_metadata(node, graph, metadata_dict, iterations)
+        
         return {"graphs": graphs}
    
     def create_metadata(self, node, graph, metadata_dict, iterations):
@@ -58,7 +60,19 @@ class CFGgridME(Adapter):
                                 )
                             )
 
-    def 
+    def add_attributes(self, node, graph, metadata_dict):
+        for item in metadata_dict:
+            for operation, meta_list in item.items():
+                for value in meta_list:
+                    if operation == node.id:
+                        key = self.clean_data(value)
+                        value = self.clean_data(meta_list.get(value))
+
+                        node.attrs.append(graph_builder.KeyValue(
+                            key = key,
+                            value = value
+                        ))
+                    
 
     def clean_data(self, line: str):
        clean_line =  line.replace("\\", '').replace("'", '').replace("[", '').replace("]", '')
@@ -113,7 +127,6 @@ class CFGgridME(Adapter):
             edges.append(edge[0])
             if len(edge) > 1 and 'x' in edge[0]:
                 iteration[edge[0]] = edge[1]
-                print("iteration", iteration)
             else:
                 iteration[edge[0]] = "1"
 
