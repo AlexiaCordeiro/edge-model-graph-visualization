@@ -36,29 +36,25 @@ class CFGgridME(Adapter):
         for node in graph.nodes:
             self.create_edges(node, block,graph)
             self.add_attributes(node, graph, metadata_dict)
-            self.create_metadata(node, graph, metadata_dict, iterations)
+            self.create_metadata(node, iterations)
         
         return {"graphs": graphs}
    
-    def create_metadata(self, node, graph, metadata_dict, iterations):
-        for item in metadata_dict:
-            for operation, meta_list in item.items():
-                for i, value in enumerate(meta_list):
-                    if operation == node.id:
-                        key = self.clean_data(value)
-                        value = self.clean_data(meta_list.get(value))
-                        if str(node.id) not in iterations:
-                            iterations[str(node.id)] = '1'
-                        node.outputsMetadata.append(
-                            graph_builder.MetadataItem(
-                                id=i,
-                                attrs=[
-                                    graph_builder.KeyValue(
-                                        key=key, 
-                                        value=value,
-                                    )]
-                                )
+    def create_metadata(self, node, iterations):
+        if node.id not in iterations:
+            iterations[node.id] = '1'
+        for operation, iteration in iterations.items():
+            if operation == node.id:
+                node.outputsMetadata.append(
+                    graph_builder.MetadataItem(
+                        id=node.id,
+                        attrs=[
+                                graph_builder.KeyValue(
+                                    key='iteration',
+                                    value=iteration
+                                )]
                             )
+                        )
 
     def add_attributes(self, node, graph, metadata_dict):
         for item in metadata_dict:
