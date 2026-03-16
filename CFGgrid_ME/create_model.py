@@ -102,10 +102,10 @@ def main():
     """Get values"""
     args = arguments()
     
-    model_file = args.model_file
-    dot_file = args.dot_file
+    model_path = args.model_file
+    dot_path = args.dot_file
     function_name = args.function_name
-    convert = args.convert_file
+    convert = args.convert
 
     if not function_name:
         function_name = "main"
@@ -125,7 +125,7 @@ def main():
         file_path = f"{folder_name}/{function_name}_metadados.cfg"
    
 
-    if convert_file:
+    if convert:
         print(f"Addapted file with metadata generated in {file_path}")
     else:
         _run_model(file_path)
