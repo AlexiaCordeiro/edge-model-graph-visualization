@@ -1,12 +1,14 @@
 """
 subprocess: used to run terminal commands via python
 """
+import argparse
 import os
 import subprocess
-import argparse
-from utils.generate_cfg_file import (
-    generate_files,
-)
+
+from utils.generate_cfg_file import generate_files
+from utils.get_nodes import (check_if_layer_called,
+                             get_correct_block_via_func_name,
+                             get_correct_block_via_layer)
 from utils.treat_data import treat_metadata
 
 
@@ -28,8 +30,6 @@ def arguments():
                         help="If you want to just addapt the value to add metadata")
     args = parser.parse_args()
 
-   
-
     return args
 
 def get_model(model_path: str) -> list:
@@ -45,34 +45,6 @@ def get_model(model_path: str) -> list:
         print(f"Error reading file: {e}")
 
     return model
-
-
-def get_correct_block(model: list, function_name: str):
-    """
-    Based on the list with the lines of the CFG in model,
-    this function gets the specific block informed by the user
-    via function_name
-    """
-
-    block = []
-    init_block = -1
-    finish_block = -1
-    correct_start = "::" + function_name
-    for i, line in enumerate(model):
-        if (line.startswith("[cfg") 
-        and function_name in line 
-        and correct_start in line):
-            init_block = i
-            break
-
-    for i in range(init_block + 1, len(model)):
-        if model[i].startswith("[cfg"):
-            break
-
-        finish_block = i
-
-    block = model[init_block : finish_block + 1]
-    return block
 
 
 def _run_model(file_path: str):
@@ -112,11 +84,17 @@ def main():
 
     model = get_model(model_path)
     dot_data = get_metadata(dot_path)
-    block = get_correct_block(model, function_name)
+    block = get_correct_block_via_func_name(model, function_name)
+    connected_layer = check_if_layer_called(block)
+    connected_block = get_correct_block_via_layer(model, connected_layer) if connected_layer else None
     treated_metadata = treat_metadata(dot_data)
-    generate_files(block, treated_metadata, function_name)
-    folder_name = "generated_files"
     
+    if connected_block:
+        generate_files(block, connected_block, treated_metadata, function_name)
+    else:
+        generate_files(block, [], treated_metadata, function_name)
+    
+    folder_name = "generated_files"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
     
@@ -124,7 +102,6 @@ def main():
     if dot_path:
         file_path = f"{folder_name}/{function_name}_metadados.cfg"
    
-
     if convert:
         print(f"Addapted file with metadata generated in {file_path}")
     else:
