@@ -13,9 +13,8 @@ def generate_files(model: list, block: list, metadata: dict, function_name: str)
     _create_files(final_block, file_name)
     if metadata:
         file_name = f"generated_files/{function_name}_metadados.cfg"
-        new_block = add_metadata_in_cfg(block, metadata)
-        final_block = connect_blocks(new_block, connected_blocks)
-        _create_files(final_block, file_name)
+        new_block = add_metadata_in_cfg(final_block, metadata)
+        _create_files(new_block, file_name)
 
 
 def collect_all_connected_blocks(model: list, block: list) -> list:
@@ -71,29 +70,17 @@ def add_metadata_in_cfg(block: list, metadata: dict) -> list:
     is possible add metadata on model explorer
     """
     new_block = []
-    complete_block = block.copy()
-    cfg_header = complete_block.pop(0)
-    new_block.append(cfg_header)
     
-    for line in complete_block:
+    for line in block:
         if line.startswith("[node"):
             op_name = line.split()[2]
             if op_name in metadata:
                 new_block.append(line)
-                new_block.append(metadata[op_name])
+                for instr in metadata[op_name]:
+                    new_block.append(instr)
             else:
                 new_block.append(line)
         else:
             new_block.append(line)
     
-    return new_block
-
-    commplete_block = block.copy()
-    block.pop(0)
-    for line, name in zip(block, metadata):
-        if line.startswith("[node") and name in line:
-            new_block.append(line)
-            new_block.append(metadata[name])
-
-    new_block.insert(0, commplete_block[0])
     return new_block
