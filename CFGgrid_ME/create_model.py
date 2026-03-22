@@ -85,14 +85,9 @@ def main():
     model = get_model(model_path)
     dot_data = get_metadata(dot_path)
     block = get_correct_block_via_func_name(model, function_name)
-    connected_layer = check_if_layer_called(block)
-    connected_block = get_correct_block_via_layer(model, connected_layer) if connected_layer else None
     treated_metadata = treat_metadata(dot_data)
     
-    if connected_block:
-        generate_files(block, connected_block, treated_metadata, function_name)
-    else:
-        generate_files(block, [], treated_metadata, function_name)
+    generate_files(model, block, treated_metadata, function_name)
     
     folder_name = "generated_files"
     if not os.path.exists(folder_name):
