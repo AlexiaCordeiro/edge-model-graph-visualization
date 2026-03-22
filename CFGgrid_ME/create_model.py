@@ -27,7 +27,7 @@ def arguments():
     parser.add_argument("-f", "--function_name", required=False,
                         help="Name of the function to focus on in the CFG")
     parser.add_argument("-c", "--convert", required=False,
-                        help="If you want to just addapt the value to add metadata")
+                        help="Generate adapted file without opening Model Explorer")
     args = parser.parse_args()
 
     return args
