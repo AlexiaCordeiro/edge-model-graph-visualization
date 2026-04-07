@@ -12,10 +12,9 @@ def generate_files(model: list, block: list, metadata: dict, function_name: str)
     final_block = connect_blocks(block, connected_blocks)
     _create_files(final_block, file_name)
     if metadata:
-        file_name = f"generated_files/{function_name}_metadados.cfg"
-        new_block = add_metadata_in_cfg(block, metadata)
-        final_block = connect_blocks(new_block, connected_blocks)
-        _create_files(final_block, file_name)
+        file_name = f"generated_files/{function_name}_metadata.cfg"
+        new_block = add_metadata_in_cfg(final_block, metadata)
+        _create_files(new_block, file_name)
 
 
 def collect_all_connected_blocks(model: list, block: list) -> list:
@@ -61,39 +60,27 @@ def _create_files(block: list, file_name: str):
         with open(file_name, "w", encoding="utf8") as b:
             for line in block:
                 b.write(f"{line}\n")
+        print(f"File generated: {file_name}")
     except OSError as e:
         print(f"Error creating file:{e}")
 
 
 def add_metadata_in_cfg(block: list, metadata: dict) -> list:
     """
-    Adds dot info into the cfg so that
+    Adds map info into the cfg so that
     is possible add metadata on model explorer
     """
+
     new_block = []
-    complete_block = block.copy()
-    cfg_header = complete_block.pop(0)
-    new_block.append(cfg_header)
-    
-    for line in complete_block:
+    print("Adding metadata to CFG...")
+    for line in block:
+        new_block.append(line)
         if line.startswith("[node"):
             op_name = line.split()[2]
             if op_name in metadata:
-                new_block.append(line)
-                new_block.append(metadata[op_name])
-            else:
-                new_block.append(line)
-        else:
-            new_block.append(line)
+                for meta_line in metadata[op_name]:
+                    new_block.append(meta_line)
+                    if meta_line.endswith(">"):
+                        break
     
-    return new_block
-
-    commplete_block = block.copy()
-    block.pop(0)
-    for line, name in zip(block, metadata):
-        if line.startswith("[node") and name in line:
-            new_block.append(line)
-            new_block.append(metadata[name])
-
-    new_block.insert(0, commplete_block[0])
     return new_block

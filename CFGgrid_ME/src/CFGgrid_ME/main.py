@@ -230,7 +230,7 @@ class CFGgridME(Adapter):
 
             if self._is_layer_node_line(line, layer_prefix):
                 parsed_op_name, edges, line_iterations, called_addresses = self._parse_node_line(line)
-                iterations = line_iterations
+                iterations.update(line_iterations)
 
                 if parsed_op_name:
                     op_name = parsed_op_name
