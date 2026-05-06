@@ -5,7 +5,9 @@
 ---
 
 *Windows*: [Use WSL on Windows (Ubuntu 22.04)](https://learn.microsoft.com/pt-br/windows/wsl/install)
+
 *Common Linus Distros*: Skip the Docker setup
+
 *Non Common Linux Distros*: use the provided Docker image.
 
 ## Using Docker (recommended)
