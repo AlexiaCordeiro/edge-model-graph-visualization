@@ -57,7 +57,7 @@ pip install -e .
 
 > `pip install -e .` assumes the adapter code is in the current directory (`/workspace`). Adjust the path if needed.
 
-**4. Start the server**
+**4. Start the server to test if the installation worked**
 
 ```bash
 model-explorer --host=0.0.0.0 --extensions CFGgrid_ME
