@@ -9,14 +9,28 @@ Edge Model Graph Visualization is an adapter that brings [CFGgrind](https://gith
 | OS | Notes |
 |----|-------|
 | Windows | Use WSL2 with Ubuntu 22.04 |
-| Ubuntu 22.04+, Debian 12+, Fedora 36+ | Native installation works |
+| Ubuntu 22.04+, Debian 12+, Fedora 36+, MAC | Native installation works |
 | Other Linux distros or older glibc | Use the Docker image |
 
 ---
 
 ## Installation
 
-### Option A — Docker (Recommended)
+### Option A — Native Installation
+
+Only recommended if you're on Ubuntu 22.04+m MAC or a distro with a compatible `glibc`.
+
+```bash
+cd CFGgrid_me
+python3 -m venv venv
+source venv/bin/activate   
+pip install ai-edge-model-explorer
+pip install -e .
+```
+
+---
+
+### Option B — Docker
 
 Docker is the safest choice if you're unsure about your system's `glibc` version.
 
@@ -46,9 +60,10 @@ docker run -it --network host \
 
 **3. Set up the Python environment**
 
-Inside the container:
+Inside the container and the project folder:
 
 ```bash
+cd CFGgrid_me
 python3 -m venv venv
 source venv/bin/activate
 pip install ai-edge-model-explorer
@@ -67,18 +82,6 @@ Then open **http://localhost:8080** in your browser.
 
 ---
 
-### Option B — Native Installation
-
-Only recommended if you're on Ubuntu 22.04+ or a distro with a compatible `glibc`.
-
-```bash
-python3 -m venv venv
-source venv/bin/activate   
-pip install ai-edge-model-explorer
-pip install -e .
-```
-
----
 
 ## Usage
 
