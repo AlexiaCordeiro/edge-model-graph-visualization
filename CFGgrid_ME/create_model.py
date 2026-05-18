@@ -23,9 +23,9 @@ def arguments():
                         help="Simply run Model Explorer")
     parser.add_argument("-c", "--convert",action="store_true",
                         help="Generate adapted file without opening Model Explorer")
-    parser.add_argument("-m", "--model_file",
+    parser.add_argument("-g", "--graph_file",
                         help="Path to the input model file (CFG file)")
-    parser.add_argument("-d", "--map_file",
+    parser.add_argument("-m", "--map_file",
                         help="Path to output map file for graph visualization")
     parser.add_argument("-f", "--function_name",
                         help="Name of the function to focus on in the CFG")
@@ -78,7 +78,7 @@ def _run_only_model():
 
 def get_metadata(map_path: str) -> list:
     """
-    Will get the metadata via the dot file informed
+    Will get the metadata via the MAP file informed
     """
     map_data = []
     if map_path:
@@ -86,7 +86,7 @@ def get_metadata(map_path: str) -> list:
             with open(map_path, "r", encoding="utf8") as j:
                 map_data = [line.strip() for line in j if line.strip()]
         except OSError as e:
-            print(f"Error getting dot file: {e}")
+            print(f"Error getting MAP file: {e}")
 
     return map_data
 
@@ -101,7 +101,7 @@ def get_node_addresses(block: list) -> set:
 def main():
     args = arguments()
 
-    model_path = args.model_file
+    model_path = args.graph_file
     map_path = args.map_file
     function_name = args.function_name or "main"
     convert = args.convert

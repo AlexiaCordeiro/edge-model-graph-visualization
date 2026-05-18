@@ -8,7 +8,7 @@ def generate_files(model: list, block: list, metadata: dict, function_name: str)
     Generates both files with and without metadata
     """
     connected_blocks = collect_all_connected_blocks(model, block)
-    file_name = f"generated_files/{function_name}_addapted.cfg"
+    file_name = f"generated_files/{function_name}_adapted.cfg"
     final_block = connect_blocks(block, connected_blocks)
     _create_files(final_block, file_name)
     if metadata:
@@ -60,7 +60,6 @@ def _create_files(block: list, file_name: str):
         with open(file_name, "w", encoding="utf8") as b:
             for line in block:
                 b.write(f"{line}\n")
-        print(f"File generated: {file_name}")
     except OSError as e:
         print(f"Error creating file:{e}")
 

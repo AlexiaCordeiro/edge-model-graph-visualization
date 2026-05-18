@@ -117,7 +117,7 @@ Then open **http://localhost:8080** in your browser.
 python create_model.py -m input.cfg -c
 ```
 
-This generates `generated_files/<basename>_addapted.cfg`. From there:
+This generates `generated_files/<basename>_adapted.cfg`. From there:
 
 1. Open **http://localhost:8080** in your browser.
 2. Upload the generated `.cfg` file using the upload button.
@@ -172,7 +172,7 @@ All output files are written to `generated_files/`.
 
 | File Pattern | Description |
 |--------------|-------------|
-| `*_addapted.cfg` | Basic CFG — no assembly metadata; smaller and faster to load |
+| `*_adapted.cfg` | Basic CFG — no assembly metadata; smaller and faster to load |
 | `*_metadata.cfg` | Enriched CFG — includes assembly instructions and iteration counts; requires a `.map` file |
 
 ---

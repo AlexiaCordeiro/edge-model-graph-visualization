@@ -121,7 +121,7 @@ class CFGgridME(Adapter):
             for value in block[key]:
                 node = graph_builder.GraphNode(
                     id=value[0],
-                    label=value[0],
+                    label=key.split(":")[0],
                     namespace=key,
                 )
                 nodes.append(node)
