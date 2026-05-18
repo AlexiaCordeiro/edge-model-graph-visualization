@@ -4,13 +4,36 @@ Edge Model Graph Visualization is an adapter that brings [CFGgrind](https://gith
 
 ---
 
+## Table of Contents
+
+- [System Requirements](#system-requirements)
+- [Installation](#installation)
+  - [Option A — Native Installation](#option-a--native-installation)
+  - [Option B — Docker](#option-b--docker)
+- [Usage](#usage)
+  - [Basic Workflow](#basic-workflow)
+  - [Command-Line Reference](#command-line-reference)
+  - [Examples](#examples)
+  - [Output Files](#output-files)
+- [Troubleshooting](#troubleshooting)
+
+---
+
 ## System Requirements
 
 | OS | Notes |
 |----|-------|
-| Windows | Use WSL2 with Ubuntu 22.04 |
+| Windows | Use [WSL2](https://learn.microsoft.com/pt-br/windows/wsl/install) with Ubuntu 22.04 |
 | Ubuntu 22.04+, Debian 12+, Fedora 36+, MAC | Native installation works |
 | Other Linux distros or older glibc | Use the Docker image |
+
+Please ensure that you have:
+
+Python version > **3.9**
+
+glibc version > **2.17**
+
+PIP version > **0.1.21**
 
 ---
 
@@ -18,7 +41,7 @@ Edge Model Graph Visualization is an adapter that brings [CFGgrind](https://gith
 
 ### Option A — Native Installation
 
-Only recommended if you're on Ubuntu 22.04+m MAC or a distro with a compatible `glibc`.
+Only recommended if you're on Ubuntu 22.04+, MAC or a distro with a compatible `glibc`.
 
 ```bash
 cd CFGgrid_me
@@ -72,19 +95,22 @@ pip install -e .
 
 > `pip install -e .` assumes the adapter code is in the current directory (`/workspace`). Adjust the path if needed.
 
-**4. Start the server to test if the installation worked**
-
-```bash
-model-explorer --host=0.0.0.0 --extensions CFGgrid_ME
-```
-
-Then open **http://localhost:8080** in your browser.
-
 ---
 
 
 ## Usage
 
+**Start the server to test if the installation worked**
+
+**If you are on the docker, please use --host=0.0.0.0 to create a tunneling**
+
+```bash
+model-explorer --extensions CFGgrid_ME
+```
+
+Then open **http://localhost:8080** in your browser.
+
+---
 ### Basic Workflow
 
 ```bash
@@ -116,20 +142,20 @@ This generates `generated_files/<basename>_addapted.cfg`. From there:
 Convert the full program and open Model Explorer:
 
 ```bash
-python create_model.py -m test.cfg
+python create_model.py -m  <file>.cfg
 ```
 
 Convert only, without launching the UI:
 
 ```bash
-python create_model.py -m test.cfg -c
+python create_model.py -m <file>.cfg -c
 ```
 
 Extract a single function's CFG with assembly metadata:
 
 ```bash
-python create_model.py -m test.cfg -d test.map -f main -c
-# Output: generated_files/main_metadados.cfg
+python create_model.py -m <file>.cfg -d <file>.map -f main -c
+# Output: generated_files/main_metadata.cfg
 ```
 
 Launch Model Explorer with an empty workspace (for manual file uploads):
@@ -147,9 +173,7 @@ All output files are written to `generated_files/`.
 | File Pattern | Description |
 |--------------|-------------|
 | `*_addapted.cfg` | Basic CFG — no assembly metadata; smaller and faster to load |
-| `*_metadados.cfg` | Enriched CFG — includes assembly instructions and iteration counts; requires a `.map` file |
-
-> **Tip:** Use `*_metadados.cfg` whenever you're doing reverse engineering or low-level debugging. Iteration counts on edges highlight hot paths and loop frequencies. Double-click any function call node to drill into its CFG; use the browser back button to return.
+| `*_metadata.cfg` | Enriched CFG — includes assembly instructions and iteration counts; requires a `.map` file |
 
 ---
 
