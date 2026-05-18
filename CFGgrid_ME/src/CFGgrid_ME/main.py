@@ -34,19 +34,19 @@ class CFGgridME(Adapter):
         graphs = [graph]
         nodes = []
 
-        block, metadata_dict, iterations, connected_layer_dict = self.create_block(cfggrind_model)
-        self.create_node(nodes, block)
+        block, metadata_dict, iterations, connected_layer_dict, function_names = self.create_block(cfggrind_model)
+        layer_key_map = self.create_node(nodes, block, function_names)
         graph.nodes.extend(nodes)
 
         for node in graph.nodes:
             self.create_edges(node, block,graph)
             self.add_attributes(node, graph, metadata_dict)
             self.create_metadata(node, iterations)
-            self.connect_layers(node, block, graph, connected_layer_dict) if connected_layer_dict else None
-        
+            self.connect_layers(node, block, graph, connected_layer_dict, layer_key_map) if connected_layer_dict else None
+
         return {"graphs": graphs}
    
-    def connect_layers(self, node, block, graph, connected_layer_dict):
+    def connect_layers(self, node, block, graph, connected_layer_dict, layer_key_map):
         """
         Creates edges between nodes in different layers (function calls).
         Connects a calling node to the first/entry node of the called function.
@@ -74,11 +74,11 @@ class CFGgridME(Adapter):
 
             target_layers = connected_layer_dict[source_id]
             for target_layer in target_layers:
-                layer_prefix = target_layer.split(":")[0]
-                target_node = next((n for n in graph.nodes if n.namespace == target_layer and n.id == layer_prefix), None)
-                if target_node:
-                    _add_edge(source_id, target_node.id)
-                    _resolve_chain(target_node.id, visited)
+                # Get the first node id for this target layer
+                if target_layer in layer_key_map:
+                    target_node_id = layer_key_map[target_layer]
+                    _add_edge(source_id, target_node_id)
+                    _resolve_chain(target_node_id, visited)
 
         _resolve_chain(node.id, set())
 
@@ -116,17 +116,25 @@ class CFGgridME(Adapter):
        clean_line =  line.replace("\\", '').replace("'", '').replace("[", '').replace("]", '')
        return clean_line
 
-    def create_node(self, nodes, block):
+    def create_node(self, nodes, block, function_names):
+        layer_key_map = {}  # Maps layer_key to first node id of that layer
         for key in block:
-            for value in block[key]:
+            function_name = function_names.get(key, "")
+            namespace_display = function_name if function_name else key.split(":")[0]
+            layer_prefix = key.split(":")[0]
+
+            for i, value in enumerate(block[key]):
                 node = graph_builder.GraphNode(
                     id=value[0],
-                    label=key.split(":")[0],
-                    namespace=key,
+                    label=value[0],
+                    namespace=namespace_display,
                 )
                 nodes.append(node)
+                # Store the first node's id for this layer to help with lookups
+                if i == 0:
+                    layer_key_map[key] = node.id
 
-        return nodes
+        return layer_key_map
 
     def create_edges(self, node, block, graph):
         node_edges_map = {}
@@ -169,6 +177,14 @@ class CFGgridME(Adapter):
                 iteration[edge[0]] = "1"
 
         return edges, iteration
+
+    def _extract_function_name(self, cfg_line: str) -> str:
+        """
+        Extracts the function name from a cfg header line.
+        Example: /path/to/file::functionName(142) -> functionName
+        """
+        match = re.search(r'::(\w+)\(', cfg_line)
+        return match.group(1) if match else ""
 
     def _parse_cfg_header(self, line):
         if "cfg" not in line:
@@ -216,6 +232,7 @@ class CFGgridME(Adapter):
         layer_prefix = None
         connected_layers = {}
         layer_address_map = {}
+        function_names = {}
         op_name = ""
         iterations = {}
 
@@ -226,6 +243,9 @@ class CFGgridME(Adapter):
                 block[current_layer] = []
                 layer_prefix = current_layer.split(":")[0]
                 layer_address_map[layer_prefix] = current_layer
+                function_name = self._extract_function_name(line)
+                if function_name:
+                    function_names[current_layer] = function_name
                 continue
 
             if self._is_layer_node_line(line, layer_prefix):
@@ -244,7 +264,7 @@ class CFGgridME(Adapter):
 
         connected_layers = self._resolve_connected_layers(connected_layers, layer_address_map)
 
-        return block, op_meta, iterations, connected_layers
+        return block, op_meta, iterations, connected_layers, function_names
 
     def add_metadata(self, metadata, operation):
         separated_metadata = {}
