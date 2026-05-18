@@ -2,6 +2,9 @@
 
 Edge Model Graph Visualization is an adapter that brings [CFGgrind](https://github.com/rimsa/CFGgrind) control-flow graphs (CFGs) into Google's **AI Edge Model Explorer**. It provides an interactive, hierarchical view of dynamic control flow, complete with assembly metadata and iteration counts.
 
+<img width="1918" height="966" alt="funcionamento" src="https://github.com/user-attachments/assets/3b4b3cb5-feae-484f-b317-b8626a8a19e4" />
+
+
 ---
 
 ## Table of Contents
